@@ -118,7 +118,7 @@ while True:
     draw.text((x, top+8),     str(CPU), font=font, fill=255)
     draw.text((x, top+16),    str(MemUsage),  font=font, fill=255)
     draw.text((x, top+24),    str(Disk),  font=font, fill=255)
-    draw.text((x, top+32),    "Temp: "+str(int(TEMP))+"C ", font=font, fill=255)
+    draw.text((x, top+32),    "Temp: "+str(round(TEMP,2))+"C ", font=font, fill=255)
     draw.text((x, top+40),    "IAQ: "+str(int(IAQ))+"%", font=font, fill=255)
     draw.text((x, top+48),    "Humi: "+str(int(HUMI))+"%" , font=font, fill=255)
     draw.text((x, top+56),    "Press: "+str(int(PRESS)), font=font, fill=255)
