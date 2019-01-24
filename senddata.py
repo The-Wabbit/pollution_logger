@@ -128,7 +128,7 @@ try:
     # Sensor read loop
     while True:
         hum = sensor.humidity
-        temp = sensor.temperature
+        temp = sensor.temperature - temp_offset
         press = sensor.pressure
 
         iso = time.ctime()
