@@ -8,7 +8,7 @@ import configparser # for parsing config.ini file
 import adafruit_bme680
 import board
 import busio
-
+import sds011
 
 def get_raspid():
     # Extract serial from cpuinfo file
@@ -45,6 +45,8 @@ try:
     temp_offset = float(sensor['temp_offset'])
     interval = int(sensor['interval'])
     burn_in_time = float(sensor['burn_in_time'])
+    dust_port = sensor.get('serial_port')
+    dust_baud = sensor.get('serial_baud')
 
 except TypeError:
     print("TypeError parsing config.ini file. Check boolean datatypes!")
@@ -66,6 +68,10 @@ raspid = get_raspid()
 now = datetime.datetime.now()
 runNo = now.strftime("%Y%m%d%H%M")
 hostname = socket.gethostname()
+
+# Initialize the dust sensor
+dust = sds011.SDS011(dust_port, use_query_mode=True)
+
 
 print("Session: ", session)
 print("runNo: ", runNo)
@@ -98,7 +104,7 @@ client = InfluxDBClient(host, port, user, password, dbname)
 start_time = time.time()
 curr_time = time.time()
 burn_in_data = []
-
+dust_values = []
 # Run until keyboard out
 try:
     # Collect gas resistance burn-in values, then use the average
@@ -130,7 +136,7 @@ try:
         hum = sensor.humidity
         temp = sensor.temperature - temp_offset
         press = sensor.pressure
-
+        dust_values=dust.query()
         iso = time.ctime()
         if enable_gas:
             hum_offset = hum - hum_baseline
@@ -173,7 +179,9 @@ try:
                         "gas": gas,
                         "iaq": air_quality_score,
                         "gasbaseline": gas_baseline,
-                        "humbaseline": hum_baseline
+                        "humbaseline": hum_baseline,
+                        "PM25": dust_values[0],
+                        "PM10": dust_values[1]
                     }
                 }
             ]
